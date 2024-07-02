@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .p-images {
+        border: 2px dashed #fff;
+        border-radius: 15px;
+    }
+    .rounded-circle {
+        width: 150px;
+        height: 150px;
+        border: 3px solid #ba150c ;
+    }
+    .list-group-item{
+        background-color: rgb(33, 33, 33);
+        color: #fff;
+    }
+    .edit-profile{
+         background: linear-gradient(180deg, #ba150c, #fb1206);
+         color: #fff;
+         font-weight: bold;
+    }
+</style>
+</head>
+<body>
+    <div class="container-fluid bg-dark pb-5" style="color: #fff;">
+        <div class="container pt-3">
+            <div class="text-center">
+                <h2>{{ profile.firstName }}'s Profile</h2>
+                <img src="{{ profile.profilepic }}" class="rounded-circle" alt="Profile Picture"><br>
+                <p>{{ profile.bio }}</p>
+                <!-- Button for editing profile -->
+                <a href="" class="btn  edit-profile">Edit Profile</a>
+            </div>
+            <div class="row mt-5">
+                <div class="col-md-6 bg-dark">
+                    <ul class="list-group ">
+                        <li class="list-group-item"><strong>First Name:</strong> {{ profile.firstName }}</li>
+                        <li class="list-group-item"><strong>Email:</strong> {{ profile.email }}</li>
+                        <li class="list-group-item"><strong>Birthday:</strong> {{ profile.birthday }}</li>
+                        <li class="list-group-item"><strong>Gender:</strong> {{ profile.gender }}</li>
+                        <li class="list-group-item"><strong>Height:</strong> {{ profile.height }}</li>
+                        <li class="list-group-item"><strong>Weight:</strong> {{ profile.weight }}</li>
+                        <li class="list-group-item"><strong>Status:</strong> {{ profile.status }}</li>
+                        <li class="list-group-item"><strong>Designation:</strong> {{ profile.designation }}</li>
+                        <li class="list-group-item"><strong>Qualification:</strong> {{ profile.qualification }}</li>
+                        <li class="list-group-item"><strong>Location:</strong> {{ profile.location }}</li>
+                        <li class="list-group-item"><strong>Hobbies:</strong> {{ profile.hobbies }}</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        {% for image in profile.additional_images %}
+                        <div class="col-4 mb-3">
+                            <img src="{{ image }}" class="img-fluid p-images" alt="Additional Image" style="width: 100%; height: 180px;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
