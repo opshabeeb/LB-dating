@@ -45,50 +45,65 @@
         <div class="col-md-6">
             <div class="row">
                 <div>
-                    <img id="profile_pic_preview" src="{{ user_media.profile_pic.url }}" alt="Profile Picture Preview" style="max-width: 200px; max-height: 200px;" />
-                    <p id="profile_pic_label">Profile Picture</p>
+                    {% if user_media.profile_pic %}
+                        <img id="profile_pic_preview" src="{{ user_media.profile_pic.url }}" alt="Profile Picture Preview" style="max-width: 200px; max-height: 200px;" />
+                        <p id="profile_pic_label">Profile Picture</p>
+                    {% endif %}
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <div>
-                        <img id="additional_image1_preview" src="{{ user_media.additional_image1.url }}" alt="Additional Image 1 Preview" style="max-width: 200px; max-height: 200px;" />
-                        <p id="additional_image1_label">Additional Image 1</p>
-                    </div>
+                    {% if user_media.additional_image1 %}
+                        <div>
+                            <img id="additional_image1_preview" src="{{ user_media.additional_image1.url }}" alt="Additional Image 1 Preview" style="max-width: 200px; max-height: 200px;" />
+                            <p id="additional_image1_label">Additional Image 1</p>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="col-md-4">
-                    <div>
-                        <img id="additional_image2_preview" src="{{ user_media.additional_image2.url }}" alt="Additional Image 2 Preview" style="max-width: 200px; max-height: 200px;" />
-                        <p id="additional_image2_label">Additional Image 2</p>
-                    </div>
+                    {% if user_media.additional_image2 %}
+                        <div>
+                            <img id="additional_image2_preview" src="{{ user_media.additional_image2.url }}" alt="Additional Image 2 Preview" style="max-width: 200px; max-height: 200px;" />
+                            <p id="additional_image2_label">Additional Image 2</p>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="col-md-4">
-                    <div>
-                        <img id="additional_image3_preview" src="{{ user_media.additional_image3.url }}" alt="Additional Image 3 Preview" style="max-width: 200px; max-height: 200px;" />
-                        <p id="additional_image3_label">Additional Image 3</p>
-                    </div>
+                    {% if user_media.additional_image3 %}
+                        <div>
+                            <img id="additional_image3_preview" src="{{ user_media.additional_image3.url }}" alt="Additional Image 3 Preview" style="max-width: 200px; max-height: 200px;" />
+                            <p id="additional_image3_label">Additional Image 3</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <div>
-                        <img id="additional_image4_preview" src="{{ user_media.additional_image4.url }}" alt="Additional Image 4 Preview" style="max-width: 200px; max-height: 200px;" />
-                        <p id="additional_image4_label">Additional Image 4</p>
-                    </div>
+                    {% if user_media.additional_image4 %}
+                        <div>
+                            <img id="additional_image4_preview" src="{{ user_media.additional_image4.url }}" alt="Additional Image 4 Preview" style="max-width: 200px; max-height: 200px;" />
+                            <p id="additional_image4_label">Additional Image 4</p>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="col-md-4">
-                    <div>
-                        <img id="additional_image5_preview" src="{{ user_media.additional_image5.url }}" alt="Additional Image 5 Preview" style="max-width: 200px; max-height: 200px;" />
-                        <p id="additional_image5_label">Additional Image 5</p>
-                    </div>
+                    {% if user_media.additional_image5 %}
+                        <div>
+                            <img id="additional_image5_preview" src="{{ user_media.additional_image5.url }}" alt="Additional Image 5 Preview" style="max-width: 200px; max-height: 200px;" />
+                            <p id="additional_image5_label">Additional Image 5</p>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="col-md-4">
-                    <div>
-                        <p id="short_reel_preview">{{ user_media.short_reel.name }}</p>
-                    </div>
+                    {% if user_media.short_reel %}
+                        <div>
+                            <p id="short_reel_preview">{{ user_media.short_reel.name }}</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
+        
     </div>
 </div>
 
