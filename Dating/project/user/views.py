@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
-from django.views.generic import View, TemplateView, ListView, CreateView, UpdateView
+from django.views.generic import View, TemplateView, ListView, CreateView, UpdateView,DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -162,31 +162,19 @@ class CreateProfileView(View):
     def get(self, request):
         return render(request, 'create_profile.html')
 
-class ProfileView(View):
-    def get(self, request):
-        # Dummy profile data
-        profile = {
-            "firstName": "John",
-            "email": "john.doe@example.com",
-            "birthday": "1990-01-01",
-            "gender": "Male",
-            "bio": "A short introduction about John.",
-            "height": "180 cm",
-            "weight": "75 kg",
-            "status": "Single",
-            "designation": "Software Engineer",
-            "qualification": "B.Sc in Computer Science",
-            "location": "New York, USA",
-            "hobbies": "Reading, Traveling, Coding",
-            "profilepic": "static/images/dp.jpg",  # You should place a sample image in your static folder and refer to it here
-            "additional_images": [
-                "static/images/lad1.jpg",
-                "static/images/lad2.jpg",
-                "static/images/lad3.jpg"
-            ]
-        }
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = PersonalInfo
+    template_name = 'profile/profile.html'
+    context_object_name = 'profile'
 
-        return render(request, 'profile.html', {'profile': profile})
+    def get_object(self):
+        return get_object_or_404(PersonalInfo, user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['additional_info'] = get_object_or_404(AdditionalInfo, user=self.request.user)
+        context['user_media'] = get_object_or_404(UserMedia, user=self.request.user)
+        return context
 
 class PlansView(View):
     def get(self, request):
@@ -202,6 +190,19 @@ class P_info_CreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super(P_info_CreateView,self).form_valid(form)
+    
+class P_info_UpdateView(LoginRequiredMixin,UpdateView):
+    print('hi')
+    model = PersonalInfo
+    form_class = PersonalInfoForm
+    template_name = 'profile/create_pinfo.html'
+    success_url = reverse_lazy('index')
+    pk_url_kwarg = 'id'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+    
+    
 
 
 class A_info_CreateView(LoginRequiredMixin,CreateView):
@@ -213,6 +214,18 @@ class A_info_CreateView(LoginRequiredMixin,CreateView):
     def form_valid(self, form):
         form.instance.user =self.request.user
         return super(A_info_CreateView,self).form_valid(form)
+    
+class A_info_UpdateView(LoginRequiredMixin,UpdateView):
+    model=AdditionalInfo
+    form_class=AdditionalInfoForm
+    template_name='profile/create_ainfo.html'
+    success_url=reverse_lazy('index')
+    pk_url_kwarg = 'id'
+    
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+    
+    
     
 class UserMediaCreateView(LoginRequiredMixin,CreateView):
     model=UserMedia

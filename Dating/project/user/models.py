@@ -58,6 +58,7 @@ class PersonalInfo(models.Model):
     DOB=models.DateField()
     gender=models.CharField(choices=GENDER_CHOICES,max_length=10)
     bio=models.TextField(blank=True)
+    phone=models.CharField(max_length=12,null=True,blank=True)
     status=models.CharField(choices=STATUS_CHOICES,max_length=15)
     designation=models.CharField(max_length=25,null=True,blank=True)
     qualification=models.CharField(max_length=25)
@@ -119,5 +120,6 @@ class UserMedia(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Media"
-
+    def get_additional_images(self):
+        return [img for img in [self.additional_image1, self.additional_image2, self.additional_image3, self.additional_image4, self.additional_image5] if img]
     
