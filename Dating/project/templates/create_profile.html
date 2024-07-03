@@ -1,0 +1,205 @@
+{% extends "base.html" %} {% block content %}
+<style>
+  .btn-gender.active {
+    background: linear-gradient(180deg, #ba150c, #fb1206);
+    color: white;
+  }
+  .btn-gender:hover{
+    background: linear-gradient(180deg, #ba150c, #fb1206);
+    color: white;
+  }
+
+  .btn-intrested.active {
+    background-color: #007bff;
+    color: white;
+  }
+  .col-form-label{
+    font-weight: bold;
+  }
+  .p-images{
+    border: 2px dashed #000 ;
+    border-radius: 15px;
+    background: #fff;
+  }
+  .bi-card-image{
+    background: linear-gradient(180deg, #ba150c, #fb1206)
+  }
+  .btn-gender{
+    background-color: white;
+    color: black;
+  }
+</style>
+<div class="container-fluid bg-dark" style="color: #fff;">
+<div class="container pt-5">
+    <h2 class="text-center p-2 pe-md-0 ps-md-0" style="background: linear-gradient(180deg, #ba150c, #fb1206)">Create Profile</h2>
+    <form>
+  <div class="row">
+    <div class="col-md-6 bg-dark" style="color: #fff;">
+      
+        <div class="mb-3 row">
+          <label for="firstName" class="col-sm-4 col-form-label">First Name</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="firstName" placeholder="Enter your first name" required />
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <label for="email" class="col-sm-4 col-form-label">Email</label>
+          <div class="col-sm-8">
+            <input type="email" class="form-control" id="email" placeholder="Enter your email" required />
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <label for="birthday" class="col-sm-4 col-form-label">Birthday</label>
+          <div class="col-sm-8">
+            <input type="date" class="form-control" id="birthday" placeholder="Select your birthday" />
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <label class="col-sm-4 col-form-label">Gender</label>
+          <div class="col-sm-8 btn-group" role="group" aria-label="Gender selection">
+            <button type="button" class="btn btn-gender rounded-pill me-1" id="maleBtn">
+              Male
+            </button>
+            <button type="button" class="btn btn-gender rounded-pill me-1" id="femaleBtn">
+              Female
+            </button>
+            <button type="button" class="btn btn-gender rounded-pill" id="otherBtn">
+              Other
+            </button>
+          </div>
+          <input type="hidden" id="genderInput" name="gender" />
+        </div>
+        <div class="mb-3 row">
+          <label for="bio" class="col-sm-4 col-form-label">Bio</label>
+          <div class="col-sm-8">
+            <textarea class="form-control" id="bio" rows="3"
+              placeholder="Write a short introduction about yourself"></textarea>
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <label for="height" class="col-sm-2 col-form-label">Height</label>
+          <div class="col-sm-4">
+              <input type="text" class="form-control" id="Height" placeholder="" required name="height"/>
+          </div>
+          <label for="weight" class="col-sm-2 col-form-label">Weight</label>
+          <div class="col-sm-4">
+              <input type="text" class="form-control" id="Weight" placeholder="" required name="weight"/>
+          </div>
+      </div>
+      
+        <div class="mb-3 row">
+          <label for="status" class="col-sm-4 col-form-label">status</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="status" placeholder="" required name="status"/>
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <label for="designation" class="col-sm-2 col-form-label">designation</label>
+          <div class="col-sm-4">
+              <input type="text" class="form-control" id="designation" placeholder="" required name="designation"/>
+          </div>
+          <label for="qualification" class="col-sm-2 col-form-label">qualification</label>
+          <div class="col-sm-4">
+              <input type="text" class="form-control" id="qualification" placeholder="" required name="qualification"/>
+          </div>
+      </div>
+        <div class="mb-3 row">
+          <label for="location" class="col-sm-4 col-form-label">Location</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="Location" placeholder="" required name="location"/>
+          </div>
+        </div>
+        <div class="mb-3 row">
+        <label for="Hobbies" class="col-sm-4 col-form-label">intrests</label>
+        <div class="col-sm-6">
+            <input type="text" class="form-control" id="hobbiesInput" placeholder="Enter a hobby" aria-label="Hobbies" aria-describedby="button-addon2">
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-gender" type="button" id="button-addon2">Add</button>
+        </div>
+    </div>
+    </div>
+    <div class="col-md-6 ps-3" style="color: #fff;">
+      <div class="container mb-5">
+        <h5>select your profile picture</h5>
+        <div class="propic align-items-center justify-content-center text-center" style="width: 120px; height: 120px; position: relative;">
+          <input type="file" id="profilepic" style="display: none; border: 2px dotted #000; border-radius: 15px;" onchange="loadFile(event, 'output1')">
+          <label for="profilepic" class="btn  bi bi-plus-circle-dotted fs-3 text-danger fw-bold" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);"></label>
+          <img id="output1" class="p-images" style="width: 100%; height: 100%; border-radius:50%" />
+        </div>
+      </div>
+      <h5>add additional images</h5>
+        <div class="row mb-3">
+            <div class="col-4 img-col" style="width: 150px; height: 150px; position: relative;">
+                <input type="file" id="fileInput1" style="display: none; border: 2px dotted #000; border-radius: 15px;" onchange="loadFile(event, 'output0')">
+                <label for="fileInput1" class="btn  bi bi-card-image" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);"></label>
+                <img id="output0" class="p-images" style="width: 100%; height: 100%;" />
+            </div>
+            <div class="col-4" style="width: 150px; height: 150px; position: relative;">
+                <input type="file" id="fileInput2" style="display: none;" onchange="loadFile(event, 'output2')">
+                <label for="fileInput2" class="btn  bi bi-card-image" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);"></label>
+                <img id="output2" class="p-images" style="width: 100%; height: 100%;" />
+            </div>
+            <div class="col-4" style="width: 150px; height: 150px; position: relative;">
+                <input type="file" id="fileInput3" style="display: none;" onchange="loadFile(event, 'output3')">
+                <label for="fileInput3" class="btn  bi bi-card-image" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);"></label>
+                <img id="output3" class="p-images" style="width: 100%; height: 100%;" />
+            </div>
+            <!-- Repeat for the other 5 boxes, make sure to change the id attributes -->
+        </div>
+        <div class="row">
+          <div class="col-4" style="width: 150px; height: 150px; position: relative;">
+            <input type="file" id="fileInput4" style="display: none;" onchange="loadFile(event, 'output4')">
+            <label for="fileInput4" class="btn  bi bi-card-image" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);"></label>
+            <img id="output4" class="p-images" style="width: 100%; height: 100%;" />
+        </div>
+        <div class="col-4" style="width: 150px; height: 150px; position: relative;">
+          <input type="file" id="fileInput5" style="display: none;" onchange="loadFile(event, 'output5')">
+          <label for="fileInput5" class="btn  bi bi-card-image" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);"></label>
+          <img id="output5" class="p-images" style="width: 100%; height: 100%;" />
+      </div>
+        </div>
+    </div>
+    </div>
+  
+    <!-- <div class="container d-flex align-items-center">
+      <div style="flex-grow: 1; height: 5px; background-color: black;"></div>
+      <p class="mx-2 fw-bold pt-2">optional</p>
+      <div style="flex-grow: 1; height: 5px; background-color: black;"></div>
+  </div> -->
+  <button type="submit" class="btn btn-primary w-100 my-5">Submit</button>
+  
+</form>
+</div>
+</div>
+<script>
+  document.querySelectorAll(".btn-gender").forEach((button) => {
+    button.addEventListener("click", function () {
+      document
+        .querySelectorAll(".btn-gender")
+        .forEach((btn) => btn.classList.remove("active"));
+      this.classList.add("active");
+      document.getElementById("genderInput").value = this.innerText;
+    });
+  });
+
+  document.querySelectorAll(".btn-intrested").forEach((button) => {
+    button.addEventListener("click", function () {
+      document
+        .querySelectorAll(".btn-intrested")
+        .forEach((btn) => btn.classList.remove("active"));
+      this.classList.add("active");
+      document.getElementById("intrestedInput").value = this.innerText;
+    });
+  });
+
+    function loadFile(event, outputId) {
+        var output = document.getElementById(outputId);
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.onload = function() {
+            URL.revokeObjectURL(output.src) // free memory
+        }
+    };
+
+</script>
+{% endblock content %}
