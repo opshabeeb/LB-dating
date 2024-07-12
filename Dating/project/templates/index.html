@@ -63,6 +63,13 @@
                         <li class="nav-item">
                             <a class="nav-link fw-bolder" href="{% url 'createprofile' %}">Create P</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bolder" href="{% url 'emp_status' %}">emp</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bolder" href="{% url 'matches' %}">matchs</a>
+                        </li>
+                       
                         {% if user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link fw-bolder" href="{% url 'profile' %}">Profile</a>
@@ -99,13 +106,9 @@
         <div class="container-fluid">
             <div class="container-fluid vh-100 d-flex flex-column justify-content-center align-items-center text-center">
                 <p class="text-light fw-bolder" style="font-size: 70px;">Start Something Epic</p>
-                <button class="px-4 py-2 mt-3 fw-bold fs-5 rounded-pill border-0 text-light" style="background-image: linear-gradient(180deg, #f4443b, #fe817b);">Create account</button>
+                <a href="{% url "signin" %}"><button class="px-4 py-2 mt-3 fw-bold fs-5 rounded-pill border-0 text-light" style="background-image: linear-gradient(180deg, #f4443b, #fe817b);">Create account</button></a>
                 <button class="btn rounded-pill border-0 px-5 py-1 fw-bold bg-light mt-3 d-block d-lg-none">Login</button>
-                <a href="{% url "create_pinfo" %}"><button class="px-4 py-2 mt-3 fw-bold fs-5 rounded-pill border-0 text-light" style="background-image: linear-gradient(180deg, #f4443b, #fe817b);">Compleate profile</button>
-                <a href="{% url "create_ainfo" %}"><button class="px-4 py-2 mt-3 fw-bold fs-5 rounded-pill border-0 text-light" style="background-image: linear-gradient(180deg, #f4443b, #fe817b);">add info</button>
-                <a href="{% url "create_media" %}"><button class="px-4 py-2 mt-3 fw-bold fs-5 rounded-pill border-0 text-light" style="background-image: linear-gradient(180deg, #f4443b, #fe817b);">add media</button>
-                    
-                </a>
+                
             </div>
         </div>
         {% endblock content %}

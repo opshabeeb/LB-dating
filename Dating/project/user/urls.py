@@ -23,5 +23,7 @@ urlpatterns = [
     path('Additional_info/update/<int:id>/', views.A_info_UpdateView.as_view(), name='update_ainfo'),
     path('usermedia_create/', views.UserMediaCreateView.as_view(), name='create_media'),
     path('usermedia_update/<int:pk>/', views.UserMediaUpdateView.as_view(), name='update_media'),
+    path('employeeinfo/',views.EmployeeinfoView.as_view(), name='emp_status'),
+    path('matches/',views.Matches.as_view(), name='matches'),
 
 ]

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Customuser,PersonalInfo ,AdditionalInfo, UserMedia # Replace with your actual Customuser model import
+from .models import Customuser, Employee, Jobseeker,PersonalInfo ,AdditionalInfo, UserMedia # Replace with your actual Customuser model import
 
 
 
@@ -90,4 +90,29 @@ class UserMediaForm(forms.ModelForm):
             'additional_image5': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'short_reel': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
+class EmployeeForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        exclude=['user']
         
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add custom styling or attributes to fields if needed
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control',  # Example classes for styling
+            })
+
+
+class JobseekerForm(forms.ModelForm):
+    class Meta:
+        model = Jobseeker
+        fields = ['title','expertise_level']     
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add custom styling or attributes to fields if needed
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control',  # Example classes for styling
+            })

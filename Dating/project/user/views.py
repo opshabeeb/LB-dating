@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse_lazy
 from django.views import View
-from .forms import RegistrationForm, UserMediaForm
-from .models import OtpToken,PersonalInfo,AdditionalInfo, UserMedia
+from .forms import EmployeeForm, JobseekerForm, RegistrationForm, UserMediaForm
+from .models import Customuser, OtpToken,PersonalInfo,AdditionalInfo, UserMedia
 from .forms import PersonalInfoForm,AdditionalInfoForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -11,7 +11,8 @@ from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic import View, TemplateView, ListView, CreateView, UpdateView,DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 
 def index(request):
@@ -36,10 +37,19 @@ def signup(request):
     if request.method == "POST":
         form = RegistrationForm(request.POST)  # Bind POST data to the form instance
         if form.is_valid():
-            form.save()
+            user = form.save()
             messages.success(request, 'Account created successfully! An OTP is sent to your email.')
-            return redirect("verify-email", username=form.cleaned_data['username'])  # Redirect to verify-email URL
-        # If form is not valid, continue rendering the signup form with errors
+            
+            # Authenticate and log in the user
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            if user is not None:
+                login(request, user)
+                return redirect('create_pinfo')
+            
+            # If authentication fails, add an error message (optional)
+            messages.error(request, 'Error logging in. Please try again.')
     
     # Context to be sent to the template
     context = {
@@ -47,7 +57,7 @@ def signup(request):
     }
     
     return render(request, 'account/signup.html', context)
-    
+
 def verify_email(request, username):
     user = get_user_model().objects.get(username=username)
     user_otp = OtpToken.objects.filter(user=user).last()
@@ -62,7 +72,7 @@ def verify_email(request, username):
                 user.is_active=True
                 user.save()
                 messages.success(request, "Account activated successfully!! You can Login.")
-                return redirect("signin")
+                return redirect("create_pinfo")
             
             # expired token
             else:
@@ -124,11 +134,9 @@ def signin(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
-        print(f"Username: {username}, Password: {password}")  # Debug line
-        
+         
         user = authenticate(request, username=username, password=password)
-        print(user)
+        
         if user is not None:
             login(request, user)
             messages.success(request, f"Hi {request.user.username}, you are now logged-in")
@@ -185,14 +193,14 @@ class P_info_CreateView(LoginRequiredMixin, CreateView):
     model = PersonalInfo
     form_class = PersonalInfoForm
     template_name = 'profile/create_pinfo.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('create_ainfo')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super(P_info_CreateView,self).form_valid(form)
     
 class P_info_UpdateView(LoginRequiredMixin,UpdateView):
-    print('hi')
+    
     model = PersonalInfo
     form_class = PersonalInfoForm
     template_name = 'profile/create_pinfo.html'
@@ -209,7 +217,7 @@ class A_info_CreateView(LoginRequiredMixin,CreateView):
     model=AdditionalInfo
     form_class=AdditionalInfoForm
     template_name='profile/create_ainfo.html'
-    success_url=reverse_lazy('index')
+    success_url=reverse_lazy('create_media')
     
     def form_valid(self, form):
         form.instance.user =self.request.user
@@ -219,7 +227,7 @@ class A_info_UpdateView(LoginRequiredMixin,UpdateView):
     model=AdditionalInfo
     form_class=AdditionalInfoForm
     template_name='profile/create_ainfo.html'
-    success_url=reverse_lazy('index')
+    success_url=reverse_lazy('create_media')
     pk_url_kwarg = 'id'
     
     def get_queryset(self):
@@ -227,28 +235,19 @@ class A_info_UpdateView(LoginRequiredMixin,UpdateView):
     
     
     
-class UserMediaCreateView(LoginRequiredMixin,CreateView):
-    model=UserMedia
-    form_class=UserMediaForm
-    template_name='profile/create_umedia.html'
-    success_url=reverse_lazy('index')
     
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super(UserMediaCreateView,self).form_valid(form)
-    
-class UserMediaUpdateView(LoginRequiredMixin,CreateView):
-    model=UserMedia
-    form_class=UserMediaForm
-    template_name='profile/update_umedia.html'
-    success_url=reverse_lazy('index')
-    
+class UserMediaCreateView(LoginRequiredMixin, CreateView):
+    model = UserMedia
+    form_class = UserMediaForm
+    template_name = 'profile/update_umedia.html'
+    success_url = reverse_lazy('emp_status')
+
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
-    
+
     def form_valid(self, form):
         form.instance.user = self.request.user
-        return super(UserMediaUpdateView,self).form_valid(form)
+        return super().form_valid(form)
 
 
 class UserMediaUpdateView(LoginRequiredMixin, UpdateView):
@@ -259,7 +258,7 @@ class UserMediaUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
-    
+
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
@@ -268,5 +267,78 @@ class UserMediaUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['user_media'] = get_object_or_404(UserMedia, user=self.request.user, pk=self.kwargs['pk'])
         return context
+
     
+class EmployeeinfoView(View,LoginRequiredMixin):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('signin')
+        employee_form = EmployeeForm()
+        jobseeker_form = JobseekerForm()
+        return render(request, 'emp_status.html', {
+            'employee_form': employee_form,
+            'jobseeker_form': jobseeker_form
+        })
+
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return redirect('signin')
+        if 'employee_submit' in request.POST:
+            employee_form = EmployeeForm(request.POST)
+            jobseeker_form = JobseekerForm()
+            if employee_form.is_valid():
+                employee = employee_form.save(commit=False)
+                employee.user = request.user
+                employee.save()
+                return redirect('matches')
+        elif 'jobseeker_submit' in request.POST:
+            jobseeker_form = JobseekerForm(request.POST)
+            employee_form = EmployeeForm()
+            if jobseeker_form.is_valid():
+                jobseeker = jobseeker_form.save(commit=False)
+                jobseeker.user = request.user
+                jobseeker.save()
+                return redirect('matches')
+        return render(request, 'emp_status.html', {
+            'employee_form': employee_form,
+            'jobseeker_form': jobseeker_form
+        })
+
+
+
+
+class Matches(LoginRequiredMixin, TemplateView):
+    template_name = "matches.html"
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        current_user_district = current_user.personalinfo.district
+        current_user_state = current_user.personalinfo.state
+        current_user_qualification = current_user.personalinfo.qualification
+        current_user_designation = current_user.personalinfo.designation
+        
+        # Filter users based on location
+        location_filtered_users = Customuser.objects.filter(
+            Q(personalinfo__state=current_user_state) | 
+            Q(personalinfo__district=current_user_district)
+        ).exclude(id=current_user.id)
+        
+        # Filter users based on qualification and designation
+        qualification_filtered_users = Customuser.objects.filter(
+            Q(personalinfo__qualification=current_user_qualification) | 
+            Q(personalinfo__designation=current_user_designation)
+        ).exclude(id=current_user.id)
+        
+        # Attach UserMedia to each user in location_filtered_users
+        for user in location_filtered_users:
+            user.user_media = UserMedia.objects.filter(user=user).first()
+        
+        # Attach UserMedia to each user in qualification_filtered_users
+        for user in qualification_filtered_users:
+            user.user_media = UserMedia.objects.filter(user=user).first()
+        
+        context['location_filtered_users'] = location_filtered_users
+        context['qualification_filtered_users'] = qualification_filtered_users
+        
+        return context

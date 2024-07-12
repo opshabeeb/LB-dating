@@ -2,7 +2,7 @@
 <style>
   
 </style>
-<nav class="navbar navbar-expand-lg navbar-black">
+<nav class="navbar navbar-expand-lg navbar-black fixed-top">
   <div class="container-fluid">
       <a class="navbar-brand fw-bolder text-light" href="#"><img src="{% static "images/dlogo1.png" %}" alt="" height="50px"></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,12 @@
               <li class="nav-item">
                   <a class="nav-link fw-bolder" href="{% url 'createprofile' %}">Create Profile</a>
               </li>
-             
+              <li class="nav-item">
+                <a class="nav-link fw-bolder" href="{% url 'emp_status' %}">emp</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-bolder" href="{% url 'matches' %}">matchs</a>
+          </li>
           </ul>
           <div class="d-flex flex-column flex-lg-row align-items-center ms-auto mt-5 mt-lg-0">
               <p class="fw-bold text-light me-3 mb-0">

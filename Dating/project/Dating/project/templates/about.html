@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<style>
+    .about-text {
+        font-size: 16px;
+        color: rgb(215, 212, 212);
+    }
+    .btn-custom {
+        background: linear-gradient(to right,  #ba150c 0%, #fb1206 100%);
+        border: none;
+        color: white;
+        font-weight: bold;
+        text-transform: capitalize;
+    }
+    /* Custom class to remove margins on larger screens */
+    
+</style>
+
+<div class="container-fluid pe-md-0 ps-md-0 px-0">
+    <div class="container-fluid bg-black pt-5 pb-5 text-white">
+        <div class="container">
+            <h1 class="text-center">Why Choose a Dating App Like ...</h1>
+            <p class="fs-5 px-3 px-md-5">
+                When it comes to dating apps, you have plenty of options: Badoo, Bumble, Hinge, Match, POF, OKCupid, and many more. Whether you're looking for love, a date, or just a casual chat, finding the right app is crucial. Tinder helps you connect with new people and offers features designed to make meeting others easier.
+            </p>
+            <div class="text-center">
+                <button type="button" class="btn btn-custom px-4 py-3 rounded-pill fs-5 mt-3 text-light fw-bold">Join Now</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid bg-dark text-white">
+        <div class="container p-3 p-md-5">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="mb-3">Explore Your Passions</h2> 
+                    <p class="about-text">
+                        It’s easy to connect with someone when you share common interests. The Tinder app lets you add Passions to your profile and connect with people who share those interests.
+                    </p>
+                    <img src="{% static "images/abt1.jpg" %}" alt="" class="img-fluid my-3">
+                    <h2 class="mb-3">Get Photo Verified on Tinder</h2>
+                    <p class="about-text">
+                        Photo Verification helps you prove you’re the person in your photos. Profiles with a blue checkmark on Tinder mean they’ve been verified.
+                    </p>
+                    <h2 class="mb-3">See Who Likes You</h2>
+                    <p class="about-text">
+                        With Tinder Gold™, see all the people who like you, saving you time so you can focus on connections that matter.
+                    </p>
+                    <img src="{% static "images/abt3.jpg" %}" alt="" class="img-fluid my-3">
+                    <h2 class="mt-4">Endless Possibilities</h2>
+                    <p class="about-text">
+                        With over 55 billion matches made to date, Tinder brings singles together online. Unlike some apps focused on long-term relationships, Tinder offers possibilities for whatever you seek.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="mb-3">Roll With Us Anywhere</h2>
+                    <p class="about-text">
+                        Whether you’re in New York City or Chicago, Tinder lets you chat with people nearby or around the world. Tinder covers 190 countries, unmatched by many other dating apps.
+                    </p>
+                    <h2 class="mb-3">Matches at Your Fingertips</h2>
+                    <p class="about-text">
+                        Choosing a dating app means finding a trustworthy companion for your online journey. Tinder puts potential matches in front of you, making connections easier than ever.
+                    </p>
+                    <img src="{% static "images/abt2.jpg" %}" alt="" class="img-fluid my-3">
+                    <h2 class="mb-3">All-Inclusive, All the Time</h2>
+                    <p class="about-text">
+                        Tinder doesn’t filter matches based on demographics like height or education. Every user deserves a chance to connect, making Tinder a platform where everyone can make the first move.
+                    </p>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <button type="button" class="btn btn-custom px-4 py-3 rounded-pill fs-5  text-light fw-bold">Get Started</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -121,5 +121,29 @@ class UserMedia(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Media"
     def get_additional_images(self):
-        return [img for img in [self.additional_image1, self.additional_image2, self.additional_image3, self.additional_image4, self.additional_image5] if img]
+        images= [self.additional_image1, self.additional_image2, self.additional_image3, self.additional_image4, self.additional_image5] 
+        return [image for image in images if image]
+    
+class Employee(models.Model):
+    user = models.ForeignKey(Customuser, on_delete=models.CASCADE)
+    position = models.CharField(max_length=100)
+    department = models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100,blank=True,null=True)
+    location = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.position}"
+
+class Jobseeker(models.Model):
+    EXPERTISE_CHOICES=[
+        ('beginner','beginner'),
+        ('intermediate','intermediate'),
+        ('expert','expert')
+    ]
+    user = models.ForeignKey(Customuser, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100,null=True, blank=True)
+    expertise_level = models.CharField(max_length=100,choices=EXPERTISE_CHOICES)
+
+    def __str__(self):
+        return f"{self.expertise_level}"
     
