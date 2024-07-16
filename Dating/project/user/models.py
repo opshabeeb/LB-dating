@@ -10,7 +10,12 @@ from datetime import date
 
 class Customuser(AbstractUser):
     email = models.EmailField(unique=True)
-    
+    hidden_profiles = models.ManyToManyField('self', symmetrical=False, related_name='hidden_by')
+    liked_profiles = models.ManyToManyField('self', symmetrical=False, related_name='liked_by', blank=True)
+    liked_by_profiles = models.ManyToManyField('self', symmetrical=False, related_name='liked_profiles_reverse', blank=True)
+
+
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     
@@ -146,4 +151,4 @@ class Jobseeker(models.Model):
 
     def __str__(self):
         return f"{self.expertise_level}"
-    
+ 

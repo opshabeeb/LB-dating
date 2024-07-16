@@ -256,11 +256,14 @@
                   <div
             class=" container-fluid align-items-center text-center mt-3"
           >
-          <i class="bi bi-x text-danger px-2 py-1 rounded-circle fs-3 " style="border: 2px solid red;"></i>
+         <a href="{% url 'hide_profile' user.id %}"> <i class="bi bi-x text-danger px-2 py-1 rounded-circle fs-3 " style="border: 2px solid red;"></i></a>
             
             <i class="bi bi-star-fill  px-2 py-1 rounded-circle fs-3" style="border: 2px solid rgb(13, 224, 94); color:rgb(13, 224, 94);"></i>
-            <i class="bi bi-heart-fill px-2 py-1 rounded-circle fs-3" style="color:#f11e1e; border: 2px solid #f11e1e;"></i>
-            <i class="bi bi-x text-danger px-2 py-1 rounded-circle fs-3 " style="border: 2px solid red;"></i>
+            <a href="{% url 'like_profile' user.id %}" class=''>
+              <i class="bi bi-heart-fill px-2 py-1 rounded-circle fs-3" style="color: #f11e1e; border: 2px solid #f11e1e;"></i>
+          </a>
+
+              <i class="bi bi-x text-danger px-2 py-1 rounded-circle fs-3 " style="border: 2px solid red;"></i>
           </div>
                 </div>
               </div>

@@ -90,6 +90,28 @@
                 </div>
             </div>
         </div>
+        <h2>Liked Users</h2>
+
+{% if liked_users %}
+<ul>
+  {% for user in liked_users %}
+    <li class="text-light">{{ user.personalinfo.fullname }}</li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No users liked yet.</p>
+{% endif %}
+
+{% if user.liked_by_profiles.all %}
+  <p>{{ user.liked_by_profiles.count }} users liked your profile:</p>
+  <ul>
+    {% for liker in user.liked_by_profiles.all %}
+      <li>{{ liker.personalinfo.fullname}}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No one has liked your profile yet.</p>
+{% endif %}
     </div>
 </div>
 {% endblock content %}

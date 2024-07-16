@@ -13,6 +13,7 @@ from django.views.generic import View, TemplateView, ListView, CreateView, Updat
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -58,76 +59,76 @@ def signup(request):
     
     return render(request, 'account/signup.html', context)
 
-def verify_email(request, username):
-    user = get_user_model().objects.get(username=username)
-    user_otp = OtpToken.objects.filter(user=user).last()
+# def verify_email(request, username):
+#     user = get_user_model().objects.get(username=username)
+#     user_otp = OtpToken.objects.filter(user=user).last()
     
     
-    if request.method == 'POST':
-        # valid token
-        if user_otp.otp_code == request.POST['otp_code']:
+#     if request.method == 'POST':
+#         # valid token
+#         if user_otp.otp_code == request.POST['otp_code']:
             
-            # checking for expired token
-            if user_otp.otp_expires_at > timezone.now():
-                user.is_active=True
-                user.save()
-                messages.success(request, "Account activated successfully!! You can Login.")
-                return redirect("create_pinfo")
+#             # checking for expired token
+#             if user_otp.otp_expires_at > timezone.now():
+#                 user.is_active=True
+#                 user.save()
+#                 messages.success(request, "Account activated successfully!! You can Login.")
+#                 return redirect("create_pinfo")
             
-            # expired token
-            else:
-                messages.warning(request, "The OTP has expired, get a new OTP!")
-                return redirect("verify-email", username=user.username)
+#             # expired token
+#             else:
+#                 messages.warning(request, "The OTP has expired, get a new OTP!")
+#                 return redirect("verify-email", username=user.username)
         
         
-        # invalid otp code
-        else:
-            messages.warning(request, "Invalid OTP entered, enter a valid OTP!")
-            return redirect("verify-email", username=user.username)
+#         # invalid otp code
+#         else:
+#             messages.warning(request, "Invalid OTP entered, enter a valid OTP!")
+#             return redirect("verify-email", username=user.username)
         
-    context = {}
-    return render(request, "account/verify_token.html", context)
+#     context = {}
+#     return render(request, "account/verify_token.html", context)
 
-def resend_otp(request):
-    if request.method == 'POST':
-        user_email = request.POST["otp_email"]
+# def resend_otp(request):
+#     if request.method == 'POST':
+#         user_email = request.POST["otp_email"]
         
-        if get_user_model().objects.filter(email=user_email).exists():
-            user = get_user_model().objects.get(email=user_email)
-            otp = OtpToken.objects.create(user=user, otp_expires_at=timezone.now() + timezone.timedelta(minutes=5))
+#         if get_user_model().objects.filter(email=user_email).exists():
+#             user = get_user_model().objects.get(email=user_email)
+#             otp = OtpToken.objects.create(user=user, otp_expires_at=timezone.now() + timezone.timedelta(minutes=5))
             
             
-            # email variables
-            subject="Email Verification"
-            message = f"""
-                                Hi {user.username}, here is your OTP {otp.otp_code} 
-                                it expires in 5 minute, use the url below to redirect back to the website
-                                http://127.0.0.1:8000/verify-email/{user.username}
+#             # email variables
+#             subject="Email Verification"
+#             message = f"""
+#                                 Hi {user.username}, here is your OTP {otp.otp_code} 
+#                                 it expires in 5 minute, use the url below to redirect back to the website
+#                                 http://127.0.0.1:8000/verify-email/{user.username}
                                 
-                                """
-            sender = "clintonmatics@gmail.com"
-            receiver = [user.email, ]
+#                                 """
+#             sender = "clintonmatics@gmail.com"
+#             receiver = [user.email, ]
         
         
-            # send email
-            send_mail(
-                    subject,
-                    message,
-                    sender,
-                    receiver,
-                    fail_silently=False,
-                )
+#             # send email
+#             send_mail(
+#                     subject,
+#                     message,
+#                     sender,
+#                     receiver,
+#                     fail_silently=False,
+#                 )
             
-            messages.success(request, "A new OTP has been sent to your email-address")
-            return redirect("verify-email", username=user.username)
+#             messages.success(request, "A new OTP has been sent to your email-address")
+#             return redirect("verify-email", username=user.username)
 
-        else:
-            messages.warning(request, "This email dosen't exist in the database")
-            return redirect("resend-otp")
+#         else:
+#             messages.warning(request, "This email dosen't exist in the database")
+#             return redirect("resend-otp")
         
            
-    context = {}
-    return render(request, "account/resend_otp.html", context)
+#     context = {}
+#     return render(request, "account/resend_otp.html", context)
 
 
 def signin(request):
@@ -182,6 +183,9 @@ class ProfileView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['additional_info'] = get_object_or_404(AdditionalInfo, user=self.request.user)
         context['user_media'] = get_object_or_404(UserMedia, user=self.request.user)
+        # Fetch the users who have liked the current user's profile
+        context['liked_users']= self.request.user.liked_profiles.all()
+        context['liked_by']=self.request.user.liked_by_profiles.all()
         return context
 
 class PlansView(View):
@@ -320,15 +324,15 @@ class Matches(LoginRequiredMixin, TemplateView):
         
         # Filter users based on location
         location_filtered_users = Customuser.objects.filter(
-            Q(personalinfo__state=current_user_state) | 
-            Q(personalinfo__district=current_user_district)
-        ).exclude(id=current_user.id)
-        
-        # Filter users based on qualification and designation
+            (Q(personalinfo__state=current_user_state) | 
+             Q(personalinfo__district=current_user_district))
+        ).exclude(id=current_user.id).exclude(id__in=current_user.hidden_profiles.all())
+
+        # Filter users based on qualification and designation and exclude hidden profiles
         qualification_filtered_users = Customuser.objects.filter(
-            Q(personalinfo__qualification=current_user_qualification) | 
-            Q(personalinfo__designation=current_user_designation)
-        ).exclude(id=current_user.id)
+            (Q(personalinfo__qualification=current_user_qualification) | 
+             Q(personalinfo__designation=current_user_designation))
+        ).exclude(id=current_user.id).exclude(id__in=current_user.hidden_profiles.all())
         
         # Attach UserMedia to each user in location_filtered_users
         for user in location_filtered_users:
@@ -342,3 +346,20 @@ class Matches(LoginRequiredMixin, TemplateView):
         context['qualification_filtered_users'] = qualification_filtered_users
         
         return context
+@login_required   
+def hide_profile(request, user_id):
+    user_to_hide = Customuser.objects.get(id=user_id)
+    request.user.hidden_profiles.add(user_to_hide)
+    return redirect('matches')  
+
+@login_required
+def like_profile(request, user_id):
+    user_to_like = get_object_or_404(Customuser, id=user_id)
+    if user_to_like != request.user:
+        request.user.liked_profiles.add(user_to_like)
+        user_to_like.liked_by_profiles.add(request.user)
+        # Notify user_to_like here if necessary
+    return redirect('matches')  
+
+
+

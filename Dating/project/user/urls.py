@@ -14,8 +14,8 @@ urlpatterns = [
     path('createprofile', views.CreateProfileView.as_view(), name='createprofile'),
     path('profile/',views.ProfileView.as_view(), name='profile'),
     path('plans', views.PlansView.as_view(), name='plans'),
-    path("verify-email/<slug:username>", views.verify_email, name="verify-email"),
-    path("resend-otp", views.resend_otp, name="resend-otp"),
+    # path("verify-email/<slug:username>", views.verify_email, name="verify-email"),
+    # path("resend-otp", views.resend_otp, name="resend-otp"),
     path("login", views.signin, name="signin"),
     path('create_profile/', views.P_info_CreateView.as_view(), name='create_pinfo'),
     path('profile/update/<int:id>/', views.P_info_UpdateView.as_view(), name='profile_update'),
@@ -25,5 +25,8 @@ urlpatterns = [
     path('usermedia_update/<int:pk>/', views.UserMediaUpdateView.as_view(), name='update_media'),
     path('employeeinfo/',views.EmployeeinfoView.as_view(), name='emp_status'),
     path('matches/',views.Matches.as_view(), name='matches'),
+    path('hide_profile/<int:user_id>/', views.hide_profile, name='hide_profile'),
+    path('like/<int:user_id>/',views.like_profile, name='like_profile'),
+    
 
 ]
