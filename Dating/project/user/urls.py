@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
+from .views import *
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -27,6 +28,12 @@ urlpatterns = [
     path('matches/',views.Matches.as_view(), name='matches'),
     path('hide_profile/<int:user_id>/', views.hide_profile, name='hide_profile'),
     path('like/<int:user_id>/',views.like_profile, name='like_profile'),
+    
+    #friend 
+    path('send_friend_request/<int:user_id>/', send_friend_request, name='send_friend_request'),
+    path('accept_friend_request/<int:request_id>/', accept_friend_request, name='accept_friend_request'),
+    path('reject_friend_request/<int:request_id>/', reject_friend_request, name='reject_friend_request'),
+    path('friends_list/', views.friends_list, name='friends'),
     
 
 ]

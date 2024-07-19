@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse_lazy
 from django.views import View
 from .forms import EmployeeForm, JobseekerForm, RegistrationForm, UserMediaForm
-from .models import Customuser, OtpToken,PersonalInfo,AdditionalInfo, UserMedia
+from .models import Customuser, FriendRequest, OtpToken,PersonalInfo,AdditionalInfo, UserMedia
 from .forms import PersonalInfoForm,AdditionalInfoForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -342,8 +342,11 @@ class Matches(LoginRequiredMixin, TemplateView):
         for user in qualification_filtered_users:
             user.user_media = UserMedia.objects.filter(user=user).first()
         
+        friend_requests= FriendRequest.objects.filter(to_user=self.request.user, status=False)
+        
         context['location_filtered_users'] = location_filtered_users
         context['qualification_filtered_users'] = qualification_filtered_users
+        context['friend_requests']=friend_requests
         
         return context
 @login_required   
@@ -361,5 +364,40 @@ def like_profile(request, user_id):
         # Notify user_to_like here if necessary
     return redirect('matches')  
 
+#friend request/accept/reject
 
+@login_required
+def send_friend_request(request, user_id):
+    to_user = get_object_or_404(Customuser, id=user_id)
+    friend_request, created = FriendRequest.objects.get_or_create(from_user=request.user, to_user=to_user)
+    if created:
+        # Friend request sent
+        pass
+    else:
+        # Friend request was already sent
+        pass
+    return redirect('matches',)
 
+@login_required
+def accept_friend_request(request, request_id):
+    friend_request = get_object_or_404(FriendRequest, id=request_id)
+    if friend_request.to_user == request.user:
+        friend_request.status = True
+        friend_request.save()
+        # Add each other as friends (you can implement this based on your app's needs)
+    return redirect('friends')
+
+@login_required
+def reject_friend_request(request, request_id):
+    friend_request = get_object_or_404(FriendRequest, id=request_id)
+    if friend_request.to_user == request.user:
+        friend_request.delete()
+    return redirect('matches')
+
+@login_required
+def friends_list(request):
+    friends = FriendRequest.objects.filter(
+        (Q(from_user=request.user) | Q(to_user=request.user)),
+        status=True
+    )
+    return render(request, 'friends.html', {'friends': friends})

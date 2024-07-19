@@ -12,7 +12,7 @@
     background-color: #f8f9fa;
     border-right: 1px solid rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
-    overflow: hidden;
+    overflow-y: auto;
   }
 
   .sidebar.collapsed {
@@ -41,7 +41,14 @@
   .content-body {
     padding-bottom: 60px;
   }
-
+  .clickable-text {
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .clickable-text.active {
+    color: #ff5733; /* Change this to the color you want for the active state */
+  }
   .messages {
     padding: 10px 20px;
     display: flex;
@@ -66,7 +73,12 @@
     letter-spacing: 0.5px;
     font-size: 18px;
   }
-
+  .messages .friend{
+    padding: 0 10px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    font-size: 14px;
+  }
   .messages .text {
     flex: 1;
     padding: 0 10px;
@@ -74,7 +86,15 @@
     font-size: 15px;
     opacity: 0.8;
   }
-
+  .messages .actions {
+    flex:1;
+    padding:0px 10px;
+    font-weight: 300;
+  }
+  .messages .actions .btn{
+    padding:3px 7px;
+    margin-top:0px;
+  }
   .messages:hover {
     box-shadow: 0 0 15px 0 rgba(43, 78, 78, 0.1);
     border-right: 5px solid #fd5068;
@@ -164,16 +184,54 @@
     </div>
     <div class="offcanvas-body">
       <div class="menu">
-        <div class="d-flex">
-          <p id="text1" class="clickable-text me-2 fw-bold active">Matches</p>
-          <p id="text2" class="clickable-text fw-bold">Messages</p>
-        </div>
+          <div class="d-flex">
+              <p id="text1" class="clickable-text me-2 fw-bold active" onclick="toggleContent('matches')">Matches</p>
+              <p id="text2" class="clickable-text fw-bold ms-3" onclick="toggleContent('messages')">Friend requests</p>
+          </div>
       </div>
-      <div class="content-area" id="content-area">
-        <div class="gradient-box"></div>
-        <p class="fs-4 fw-bold">Start Matching</p>
+      <div id="matches_content" class="content-section" style="display: block;">
+        {% if user.liked_by_profiles.all %}
+        {% for liker in user.liked_by_profiles.all %}
+        <div class="messages" data-bs-target="#userModal{{ liker.id }}" data-bs-toggle="modal">
+          <div class="avatar">
+              <img src="{{liker.personalinfo.profile_pic.url}}" alt="" />
+          </div>
+          <div class="message">
+              <div class="user">{{ liker.personalinfo.fullname}}</div>
+              <div class="text">liked your profile</div>
+          </div>
+
       </div>
-    </div>
+      {% endfor %}
+      {% else %}
+          <p>No one has liked your profile yet.</p>
+        {% endif %}  
+          
+              
+      </div>
+      <div id="messages_content" class="content-section" style="display: none;">
+        {% if friend_requests %}
+        {% for friends in friend_requests %}
+        <div class="messages" data-bs-target="#userModal{{ friends.from_user.id }}" data-bs-toggle="modal">
+          <div class="avatar">
+              <img src="{{ friends.from_user.personalinfo.profile_pic.url }}" alt="" />
+          </div>
+          <div class="message">
+              <div class="friend"><p>{{ friends.from_user.personalinfo.fullname}}<p></div>
+              
+                <div class="actions">
+                  <a href="{% url 'accept_friend_request' friends.id %}" class="btn btn-primary me-3" ><i class="fa-solid fa-user-check" ></i></a>
+                  <a href="{% url 'reject_friend_request' friends.id %}" class="btn btn-danger"><i class="fa-solid fa-user-xmark"></i></a>
+              </div>
+              
+          </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <p>explore and make connections</p>
+       {% endif %} 
+      </div>
+  </div>
   </div>
   <div class="main-content-wrapper container-fluid" id="main-content-wrapper">
     <div class="main-content">
@@ -256,14 +314,17 @@
                   <div
             class=" container-fluid align-items-center text-center mt-3"
           >
-         <a href="{% url 'hide_profile' user.id %}"> <i class="bi bi-x text-danger px-2 py-1 rounded-circle fs-3 " style="border: 2px solid red;"></i></a>
+          <a href="{% url 'like_profile' user.id %}" class=''>
+            <i class="bi bi-heart-fill px-2 py-1 rounded-circle fs-3" style="color: #f11e1e; border: 2px solid #f11e1e;"></i>
+        </a>
             
             <i class="bi bi-star-fill  px-2 py-1 rounded-circle fs-3" style="border: 2px solid rgb(13, 224, 94); color:rgb(13, 224, 94);"></i>
-            <a href="{% url 'like_profile' user.id %}" class=''>
-              <i class="bi bi-heart-fill px-2 py-1 rounded-circle fs-3" style="color: #f11e1e; border: 2px solid #f11e1e;"></i>
-          </a>
+            
 
-              <i class="bi bi-x text-danger px-2 py-1 rounded-circle fs-3 " style="border: 2px solid red;"></i>
+             <a href="{% url 'send_friend_request' user.id %}"> <i class="fas fa-user-friends text-info px-2 py-2 rounded-circle fs-3 " style="border: 2px solid rgb(88, 183, 255);"></i></a>
+
+              <a href="{% url 'hide_profile' user.id %}"> <i class="bi bi-x text-danger px-2 py-1 rounded-circle fs-3 " style="border: 2px solid red;"></i></a>
+
           </div>
                 </div>
               </div>
@@ -319,5 +380,12 @@
       });
     });
   });
+
+function toggleContent(contentType) {
+  document.getElementById('matches_content').style.display = contentType === 'matches' ? 'block' : 'none';
+  document.getElementById('messages_content').style.display = contentType === 'messages' ? 'block' : 'none';
+  document.getElementById('text1').classList.toggle('active', contentType === 'matches');
+  document.getElementById('text2').classList.toggle('active', contentType === 'messages');
+}
 </script>
 {% endblock %}

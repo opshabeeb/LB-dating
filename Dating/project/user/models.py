@@ -152,3 +152,13 @@ class Jobseeker(models.Model):
     def __str__(self):
         return f"{self.expertise_level}"
  
+#friend request model
+
+class FriendRequest(models.Model):
+    id = models.AutoField(primary_key=True)
+    from_user = models.ForeignKey(Customuser, related_name='friend_requests_sent', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(Customuser, related_name='friend_requests_received', on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.from_user} to {self.to_user}"
