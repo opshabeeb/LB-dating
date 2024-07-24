@@ -19,6 +19,17 @@
     display: none;
   }
 
+  .unseen-count {
+    position: absolute;
+    background-color: red;
+    border-radius: 50%;
+    top: 20px;
+    right: 10px;
+    font-size: 18px;
+    padding: 0px 5px;
+    color: #fff;
+  }
+
   .main-content-wrapper {
     display: flex;
     flex-direction: column;
@@ -57,6 +68,7 @@
     align-items: center;
     transition: 0.2s box-shadow;
     cursor: pointer;
+    position: relative;
   }
 
   .messages .avatar img {
@@ -75,7 +87,8 @@
   .messages .friend {
     padding: 0 10px;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 18px;
+    font-weight: bold;
   }
 
   .messages .text {
@@ -104,6 +117,104 @@
       width: 200px;
     }
   }
+
+  .chat-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-header {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column; /* Ensure messages stack from top to bottom */
+}
+
+.message-item {
+    display: flex;
+    margin-bottom: 10px;
+}
+{% comment %} .message-item.sent .avatar {
+  order: 2; /* Move avatar to the right for sent messages */
+} {% endcomment %}
+
+.message-item.received .avatar {
+  order: 1; /* Move avatar to the left for received messages */
+}
+.message-item.sent .text {
+    background-color: #e1ffc7; /* Customize sent message background */
+    align-self: flex-end;
+}
+
+.message-item.received .text {
+    background-color: #fff;
+    align-self: flex-start;
+}
+
+  .message-item .avatar img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .message-item .text {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+  }
+
+  .chat-input {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-input form {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .chat-input form .form-control {
+    flex: 1;
+    margin-right: 10px;
+    border-radius: 20px;
+  }
+
+  .chat-input input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+
+  .chat-input button {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 1.5em;
+    cursor: pointer;
+  }
 </style>
 
 <div class="container-fluid main-container py-2">
@@ -119,79 +230,118 @@
         </div>
       </div>
       <div id="matches_content" class="content-section" style="display: block;">
-        <div class="messages">
+        <div class="messages" style="position: relative;">
           <div class="avatar">
             <img src="{% static 'images/lad1.jpg' %}" alt="" />
           </div>
           <div class="message">
-            <div class="user">hello</div>
-            <div class="text">liked your profile</div>
+            <div class="user">malu</div>
+            <div class="text">helloo</div>
+            <div class="unseen-count">3</div>
           </div>
         </div>
       </div>
       <div id="messages_content" class="content-section" style="display: none;">
         {% for friend in friends %}
-        {% if friend.from_user == user %}
-        <div class="messages">
-          <div class="avatar">
-            <img src="{{ friend.to_user.personalinfo.profile_pic.url }}" alt="" />
-          </div>
-          <div class="message">
-            <div class="friend">{{ friend.to_user.personalinfo.fullname }}</div>
-            <div class="actions"></div>
-          </div>
-        </div>
-        {% else %}
-        <div class="messages">
-          <div class="avatar">
-            <img src="{{ friend.from_user.personalinfo.profile_pic.url }}" alt="" />
-          </div>
-          <div class="message">
-            <div class="friend">{{ friend.from_user.personalinfo.fullname }}</div>
-            <div class="actions"></div>
-          </div>
-        </div>
-        {% endif %}
+          <a href="{% url 'send_message' friend.id %}" class="message-link">
+            <div class="messages">
+              <div class="avatar">
+                <img src="{{ friend.personalinfo.profile_pic.url }}" alt="" />
+              </div>
+              <div class="message">
+                <div class="friend">{{ friend.personalinfo.fullname }}</div>
+                <div class="actions"></div>
+              </div>
+            </div>
+          </a>
         {% endfor %}
       </div>
     </div>
   </div>
-  <div class="main-content-wrapper container-fluid" id="main-content-wrapper">
+
+  <div class="main-content-wrapper" id="main-content-wrapper">
     <div class="main-content">
-      <a class="toggler-button position-absolute top-0 start-0" type="button" onclick="toggleSidebar()">
-        <i class="bi bi-list" style="font-size: 1.5em"></i>
-      </a>
       <div class="content-body">
-        <h1>main content</h1>
+        <a class="toggler-button position-absolute top-0 start-0" type="button" onclick="toggleSidebar()">
+          <i class="bi bi-list" style="font-size: 1.5em"></i>
+        </a>
+        
+        <div class="chat-container">
+          <div class="chat-header">
+              <h5>Chat with {{ receiver.personalinfo.fullname }}</h5>
+          </div>
+          <div class="chat-messages">
+              {% for message in messages %}
+                  <div class="message-item {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                      <div class="avatar">
+                          <img src="{{ message.sender.personalinfo.profile_pic.url }}" alt="{{ message.sender.username }}'s avatar">
+                      </div>
+                      <div class="text">
+                         {{ message.content }}
+                      </div>
+                  </div>
+              {% endfor %}
+          </div>
+          <div class="chat-input">
+              <form method="post" action="">
+                  {% csrf_token %}
+                  {{ form.content }}
+                  <button type="submit" class="btn btn-primary">Send</button>
+              </form>
+          </div>
+      </div>
+      
+      
       </div>
     </div>
   </div>
 </div>
 
 <script>
+  function toggleContent(section) {
+    const matchesContent = document.getElementById('matches_content');
+    const messagesContent = document.getElementById('messages_content');
+    const text1 = document.getElementById('text1');
+    const text2 = document.getElementById('text2');
+    
+    if (section === 'matches') {
+      matchesContent.style.display = 'block';
+      messagesContent.style.display = 'none';
+      text1.classList.add('active');
+      text2.classList.remove('active');
+    } else {
+      matchesContent.style.display = 'none';
+      messagesContent.style.display = 'block';
+      text1.classList.remove('active');
+      text2.classList.add('active');
+    }
+  }
+
   function toggleSidebar() {
     const sidebar = document.getElementById("sidebar");
     const mainContentWrapper = document.getElementById("main-content-wrapper");
     sidebar.classList.toggle("collapsed");
     mainContentWrapper.classList.toggle("full-width");
   }
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.querySelector('.chat-messages');
 
-  document.addEventListener("DOMContentLoaded", function() {
-    const clickableTexts = document.querySelectorAll(".clickable-text");
+    function scrollToBottom() {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
-    clickableTexts.forEach(text => {
-      text.addEventListener("click", function() {
-        clickableTexts.forEach(t => t.classList.remove("active"));
-        this.classList.add("active");
-      });
+    // Scroll to bottom on page load
+    scrollToBottom();
+
+    // If messages are dynamically added, scroll to bottom after a short delay
+    const observer = new MutationObserver(scrollToBottom);
+    observer.observe(chatMessages, { childList: true, subtree: true });
+
+    // Handle new messages being added through the form submission
+    const form = document.querySelector('.chat-input form');
+    form.addEventListener('submit', function() {
+      setTimeout(scrollToBottom, 100); // Delay to ensure the new message is added
     });
   });
-
-  function toggleContent(contentType) {
-    document.getElementById('matches_content').style.display = contentType === 'matches' ? 'block' : 'none';
-    document.getElementById('messages_content').style.display = contentType === 'messages' ? 'block' : 'none';
-    document.getElementById('text1').classList.toggle('active', contentType === 'matches');
-    document.getElementById('text2').classList.toggle('active', contentType === 'messages');
-  }
 </script>
 {% endblock %}

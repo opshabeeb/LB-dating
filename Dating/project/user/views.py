@@ -2,18 +2,21 @@ from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse_lazy
 from django.views import View
 from .forms import EmployeeForm, JobseekerForm, RegistrationForm, UserMediaForm
-from .models import Customuser, FriendRequest, OtpToken,PersonalInfo,AdditionalInfo, UserMedia
-from .forms import PersonalInfoForm,AdditionalInfoForm
+from .models import Customuser, FriendRequest, OtpToken,PersonalInfo,AdditionalInfo, UserMedia,Message,Friendship
+from .forms import PersonalInfoForm,AdditionalInfoForm,MessageForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
-from django.views.generic import View, TemplateView, ListView, CreateView, UpdateView,DetailView
+from django.views.generic import View, TemplateView, ListView, CreateView, UpdateView,DetailView,FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 
 def index(request):
@@ -156,9 +159,7 @@ def signin(request):
 
 
 
-class MatchingView(View):
-    def get(self, request):
-        return render(request, 'matching_page.html')
+
 
 class TestView(View):
     def get(self, request):
@@ -167,9 +168,7 @@ class TestView2(View):
     def get(self, request):
         return render(request, 'test2.html')
 
-class CreateProfileView(View):
-    def get(self, request):
-        return render(request, 'create_profile.html')
+
 
 class ProfileView(LoginRequiredMixin, DetailView):
     model = PersonalInfo
@@ -385,7 +384,9 @@ def accept_friend_request(request, request_id):
         friend_request.status = True
         friend_request.save()
         # Add each other as friends (you can implement this based on your app's needs)
-    return redirect('friends')
+        Friendship.objects.get_or_create(user=friend_request.from_user, friend=friend_request.to_user)
+        
+    return redirect('matches')
 
 @login_required
 def reject_friend_request(request, request_id):
@@ -396,8 +397,95 @@ def reject_friend_request(request, request_id):
 
 @login_required
 def friends_list(request):
-    friends = FriendRequest.objects.filter(
-        (Q(from_user=request.user) | Q(to_user=request.user)),
-        status=True
+    friendships = Friendship.objects.filter(
+        Q(user=request.user) | Q(friend=request.user)
     )
+    
+    # Retrieve friends
+    friends = []
+    for friendship in friendships:
+        if friendship.user == request.user:
+            friends.append(friendship.friend)
+        else:
+            friends.append(friendship.user)
+    
     return render(request, 'friends.html', {'friends': friends})
+
+
+
+
+
+class SendMessageView(View):
+    template_name = 'friends.html'
+
+    def get(self, request, id):
+        receiver = get_object_or_404(Customuser, id=id)
+        
+        # Fetch both received and sent messages
+        received_messages = Message.objects.filter(receiver=request.user, sender=receiver)
+        sent_messages = Message.objects.filter(sender=request.user, receiver=receiver)
+        
+        # Combine and sort messages by timestamp
+        all_messages = list(received_messages) + list(sent_messages)
+        all_messages.sort(key=lambda x: x.timestamp)
+        
+        form = MessageForm()
+        
+        # Retrieve friends
+        friendships = Friendship.objects.filter(
+            Q(user=request.user) | Q(friend=request.user)
+        )
+        friends = []
+        for friendship in friendships:
+            if friendship.user == request.user:
+                friends.append(friendship.friend)
+            else:
+                friends.append(friendship.user)
+
+        context = {
+            'form': form,
+            'receiver': receiver,
+            'messages': all_messages,
+            'friends': friends,  # Add friends to the context
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, id):
+        receiver = get_object_or_404(Customuser, id=id)
+        
+        # Fetch both received and sent messages
+        received_messages = Message.objects.filter(receiver=request.user, sender=receiver)
+        sent_messages = Message.objects.filter(sender=request.user, receiver=receiver)
+        
+        # Combine and sort messages by timestamp
+        all_messages = list(received_messages) + list(sent_messages)
+        all_messages.sort(key=lambda x: x.timestamp)
+        
+        form = MessageForm(request.POST)
+        
+        # Retrieve friends
+        friendships = Friendship.objects.filter(
+            Q(user=request.user) | Q(friend=request.user)
+        )
+        friends = []
+        for friendship in friendships:
+            if friendship.user == request.user:
+                friends.append(friendship.friend)
+            else:
+                friends.append(friendship.user)
+
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user
+            message.receiver = receiver
+            message.save()
+            messages.success(request, 'Message sent successfully.')
+            return redirect('send_message', id=id)
+        
+        context = {
+            'form': form,
+            'receiver': receiver,
+            'messages': all_messages,
+            'friends': friends,  # Add friends to the context
+        }
+        return render(request, self.template_name, context)

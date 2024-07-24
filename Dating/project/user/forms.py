@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Customuser, Employee, Jobseeker,PersonalInfo ,AdditionalInfo, UserMedia # Replace with your actual Customuser model import
+from .models import Customuser, Employee, Jobseeker,PersonalInfo ,AdditionalInfo, UserMedia,Message # Replace with your actual Customuser model import
 
 
 
@@ -116,3 +116,21 @@ class JobseekerForm(forms.ModelForm):
             field.widget.attrs.update({
                 'class': 'form-control',  # Example classes for styling
             })
+            
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['content']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add custom styling or attributes to fields if needed
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control',
+                "placeholder": 'type your meassge',# Example classes for styling
+            })
+            if field_name == 'content':
+                field.widget.attrs.update({
+                    'rows': 1,
+                })

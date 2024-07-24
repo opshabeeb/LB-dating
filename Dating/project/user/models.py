@@ -162,3 +162,21 @@ class FriendRequest(models.Model):
 
     def __str__(self):
         return f"{self.from_user} to {self.to_user}"
+    
+class Friendship(models.Model):
+    user = models.ForeignKey(Customuser, related_name='user', on_delete=models.CASCADE)
+    friend = models.ForeignKey(Customuser, related_name='friend', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} is friends with {self.friend}"
+    
+class Message(models.Model):
+    sender = models.ForeignKey(Customuser, related_name='sent_messages', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(Customuser, related_name='received_messages', on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    seen = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"{self.sender} to {self.receiver}"
